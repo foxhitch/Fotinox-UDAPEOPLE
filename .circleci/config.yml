@@ -9,6 +9,7 @@ commands:
           event: fail
           channel: fotinox-udapeople
           template: basic_fail_1
+          context: Slack-Values
 
   # destroy-environment:
   #   description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -58,8 +59,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - notify-on-fail:
-          context: Slack-Values
+      - notify-on-fail
 
   build-backend:
     docker:
@@ -77,8 +77,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - notify-on-fail:
-          context: Slack-Values
+      - notify-on-fail
 
   test-frontend:
     docker:
@@ -93,8 +92,7 @@ jobs:
              cd frontend
              npm install
              npm run test
-      - notify-on-fail:
-          context: Slack-Values
+      - notify-on-fail
                 
   test-backend:
     docker:
@@ -109,8 +107,7 @@ jobs:
              cd backend
              npm install
              npm run test
-      - notify-on-fail:
-          context: Slack-Values
+      - notify-on-fail
             
   scan-frontend:
     docker:
@@ -128,8 +125,7 @@ jobs:
              npm update minimist --depth 4
              npm update loader-utils --depth 2
              npm audit --audit-level=critical
-      - notify-on-fail:
-          context: Slack-Values
+      - notify-on-fail
 
   scan-backend:
     docker:
@@ -145,8 +141,7 @@ jobs:
              npm install            
              npm audit fix --force --audit-level=critical
              npm audit --audit-level=critical
-      - notify-on-fail:
-          context: Slack-Values
+      - notify-on-fail
 
 #   deploy-infrastructure:
 #     docker:
