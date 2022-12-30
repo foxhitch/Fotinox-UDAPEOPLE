@@ -1,17 +1,26 @@
 version: 2.1
+orbs:
+  slack: circleci/slack@4.12.0
 
-# commands:
-#   destroy-environment:
-#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-#     parameters:
-#       # Add parameter here   
-#     steps:
-#       - run:
-#           name: Destroy environments
-#           when: on_fail
-#           command: |
-#             # Your code here
-#             exit 1
+commands:
+  notify-on-fail:
+    steps:
+      - slack/notify:
+          event: fail
+          channel: fotinox-udapeople
+          template: basic_fail_1
+
+  # destroy-environment:
+  #   description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+  #   parameters:
+  #     # Add parameter here   
+  #   steps:
+  #     - run:
+  #         name: Destroy environments
+  #         when: on_fail
+  #         command: |
+  #           # Your code here
+  #           exit 1
 
 #   revert-migrations:
 #     description: Revert the last migration if successfully run in the current workflow.
@@ -49,6 +58,8 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - notify-on-fail:
+          context: Slack-Values
 
   build-backend:
     docker:
@@ -66,6 +77,8 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - notify-on-fail:
+          context: Slack-Values
 
   test-frontend:
     docker:
@@ -80,6 +93,8 @@ jobs:
              cd frontend
              npm install
              npm run test
+      - notify-on-fail:
+          context: Slack-Values
                 
   test-backend:
     docker:
@@ -94,6 +109,8 @@ jobs:
              cd backend
              npm install
              npm run test
+      - notify-on-fail:
+          context: Slack-Values
             
   scan-frontend:
     docker:
@@ -111,6 +128,8 @@ jobs:
              npm update minimist --depth 4
              npm update loader-utils --depth 2
              npm audit --audit-level=critical
+      - notify-on-fail:
+          context: Slack-Values
 
   scan-backend:
     docker:
@@ -123,10 +142,11 @@ jobs:
           name: Back-end Vulnerability Scan
           command: |
              cd backend
-             npm install
-             npm audit fix --force --audit-level=critical
+             npm install            
              npm audit fix --force --audit-level=critical
              npm audit --audit-level=critical
+      - notify-on-fail:
+          context: Slack-Values
 
 #   deploy-infrastructure:
 #     docker:
