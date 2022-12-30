@@ -9,7 +9,7 @@ commands:
           event: fail
           channel: fotinox-udapeople
           template: basic_fail_1
-          context: Slack-Values
+          # context: Slack-Values
 
   # destroy-environment:
   #   description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
