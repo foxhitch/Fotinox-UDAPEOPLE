@@ -50,8 +50,9 @@ jobs:
       - slack/notify:
           event: pass
           channel: fotinox-udapeople
-          template: success_tagged_deployment_1
-
+          template: success_tagged_deploy_1
+      - notify-on-fail
+      
   build-frontend:
     docker:
       - image: cimg/node:13.8.0
