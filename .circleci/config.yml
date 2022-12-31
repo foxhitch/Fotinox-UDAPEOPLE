@@ -9,7 +9,7 @@ commands:
           event: fail
           channel: fotinox-udapeople
           template: basic_fail_1
-          # context: Slack-Values
+
   install_awscli:
     description: Install Aws CLI
     steps:
@@ -72,8 +72,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/131evzXzpb9aKWRoRVDXaW/migration_<< parameters.Workflow_ID >>)
-            # Logic for reverting the database state
+            SUCCESS=$(curl --insecure  https://kvdb.io/5RVDmajnRPYj9a7TnvduiF/migration_<< parameters.Workflow_ID >>)
             if (( $SUCCESS == 1 ));
             then
               cd ~/project/backend
@@ -82,6 +81,7 @@ commands:
             fi
             
 jobs:
+
   notify-on-success:
     docker:
       - image: cimg/base:stable
@@ -268,19 +268,17 @@ jobs:
             npm install
             npm run migrations > migrations_dump.txt
       - run:
-          name: Send migration status to kvdb.io
+          name: Send migration status to kvdb
           command: |   
             if grep -q "has been executed successfully" ~/project/backend/migrations_dump.txt
             then
-                curl https://kvdb.io/5RVDmajnRPYj9a7TnvduiF/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/5RVDmajnRPYj9a7TnvduiF/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
+
       - destroy-environment
       - revert-migrations
       - notify-on-fail
-     # Check The KVDB To See If The Value Sent curl https://kvdb.io/N7cmQg1DwZbADh2Hu3NncF/hello -d 'world'
-     # Here's where you will add some code to rollback on failure    ${KVDB_BUCKET}  
-     # curl https://kvdb.io/N7cmQg1DwZbADh2Hu3NncF/hello \
-     #-d 'world'
+
   deploy-frontend:
     docker:
       - image: cimg/base:stable
@@ -468,33 +466,34 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
           context: Slack-Values
-      - notify-on-success:
-          requires:
-            - cloudfront-update
-          context: Slack-Values
+
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [master]
-          context: Slack-Values
+          # context: Slack-Values
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-          context: Slack-Values
+          # context: Slack-Values
       - run-migrations:
           requires: [configure-infrastructure]
-          context: Slack-Values
+          # context: Slack-Values
       - deploy-frontend:
           requires: [run-migrations]
-          context: Slack-Values
+          # context: Slack-Values
       - deploy-backend:
           requires: [run-migrations]
-          context: Slack-Values
+          # context: Slack-Values
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-          context: Slack-Values
+          # context: Slack-Values
       - cloudfront-update:
           requires: [smoke-test]
+          # context: Slack-Values
+      - cleanup:
+          requires: [cloudfront-update]
+      - notify-on-success:
+          requires:
+            - cleanup
           context: Slack-Values
-      # - cleanup:
-      #     requires: [cloudfront-update]
