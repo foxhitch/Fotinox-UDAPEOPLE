@@ -468,10 +468,6 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
           context: Slack-Values
-      - notify-on-success:
-          requires:
-            - cloudfront-update
-          context: Slack-Values
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
@@ -496,5 +492,9 @@ workflows:
       - cloudfront-update:
           requires: [smoke-test]
           context: Slack-Values
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - cleanup:
+          requires: [cloudfront-update]
+      - notify-on-success:
+          requires:
+            - cleanup
+          context: Slack-Values
